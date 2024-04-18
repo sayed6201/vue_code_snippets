@@ -16,6 +16,7 @@ function register() {
   }
 }
 
+
 const isValidEmail = computed(() => {
      return startValidation.value ? /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email.value) : null;
 });

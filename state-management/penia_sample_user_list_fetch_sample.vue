@@ -61,7 +61,7 @@ export default defineComponent({
 
 
 
-<!-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> store codes for fetching user list >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+<!-->>>>>>store codes for fetching user list >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
 import { createStore } from 'pinia';
 
 export const useUserStore = createStore({
@@ -92,3 +92,61 @@ export const useUserStore = createStore({
         },
     },
 });
+
+
+import axios from 'axios';
+
+const api = axios.create({
+    baseURL: 'https://api.example.com',
+});
+
+api.interceptors.request.use(
+    (config) => {
+        const authToken = 'your_auth_token';
+        const refreshToken = 'your_refresh_token';
+
+        // Check if token has expired
+        if (isTokenExpired(authToken)) {
+            // Refresh token
+            const newAuthToken = refreshToken(authToken, refreshToken);
+            config.headers.Authorization = `Bearer ${newAuthToken}`;
+        } else {
+            config.headers.Authorization = `Bearer ${authToken}`;
+        }
+
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+async function fetchUserList(params) {
+    try {
+        const response = await api.get('/users', { params });
+        return response.data;
+    } catch (error) {
+        throw new Error('Failed to fetch user list');
+    }
+}
+
+async function fetchNextPage(params) {
+    try {
+        const response = await api.get('/users', { params });
+        return response.data;
+    } catch (error) {
+        throw new Error('Failed to fetch next page');
+    }
+}
+
+function isTokenExpired(token) {
+    // Implement your token expiration logic here
+    // Return true if token is expired, false otherwise
+}
+
+function refreshToken(authToken, refreshToken) {
+    // Implement your token refresh logic here
+    // Return the new auth token
+}
+
+export { fetchUserList, fetchNextPage };
